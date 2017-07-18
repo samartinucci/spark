@@ -17,7 +17,7 @@
 
 package org.apache.spark.sql.hive.client
 
-import java.io.{File, PrintStream}
+import java.io.{File, IOException, PrintStream}
 import java.lang.{Iterable => JIterable}
 import java.util.{Locale, Map => JMap}
 
@@ -140,6 +140,16 @@ private[hive] class HiveClientImpl(
       } else {
         newState()
       }
+    }
+  }
+
+  def close(): Unit = withHiveState {
+    Hive.closeCurrent()
+    try {
+      state.close()
+    } catch {
+      case ioe: IOException =>
+        ioe.printStackTrace()
     }
   }
 
